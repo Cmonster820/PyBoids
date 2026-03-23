@@ -2,6 +2,7 @@ import pygame # type: ignore
 import random
 from constants import *
 from enum import *
+from utils import *
 
 class BoidState(Enum):
     SEARCHING = 0
