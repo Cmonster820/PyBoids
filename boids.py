@@ -5,10 +5,10 @@ from enum import *
 from utils import *
 
 class BoidState(Enum):
-    SEARCHING = 0
-    NORMAL = 1
-    EVADE = 2
-    CHASE = 3
+    SEARCHING = SPEED_BOID_SEARCHING
+    NORMAL = SPEED_BOID_NORMAL
+    EVADE = SPEED_BOID_EVADE
+    CHASE = SPEED_PREDATOR
 
 class Boid(pygame.sprite.Sprite):
     def __init__(self, position = None):
@@ -21,13 +21,14 @@ class Boid(pygame.sprite.Sprite):
         else:
             self.position = position
         self.rotation = random.uniform(0,360)
-        self.velocity = pygame.Vector2(SPEED_BOID_SEARCHING).rotate(self.rotation)
+        self.velocity = pygame.Vector2(SPEED_BOID_SEARCHING).rotate(self.rotation+90)
         self.neighbors = []
+        self.state = BoidState.SEARCHING
 
 
     def update(self, group):
         min_dist = float("inf")
-        closest_boid = Boid()
+        closest_boid = None
         for boid in group:
             dist = self.position.distance_to(boid.position)
             if min_dist < dist:
@@ -35,6 +36,25 @@ class Boid(pygame.sprite.Sprite):
                 min_dist = dist
             if dist<NEIGHBOR_RANGE:
                 self.neighbors.append(boid)
+        if closest_boid:
+            self.state = BoidState.NORMAL
+        if not closest_boid:
+            self.state = BoidState.SEARCHING
+        average_neighbor_rotation = sum(self.neighbors.rotation)/len(self.neighbors)
+        self.rotation+=lerp(-MAX_ROTATION_PER_FRAME,MAX_ROTATION_PER_FRAME,average_neighbor_rotation-self.rotation)
+        self.rotation+=random.uniform(-RANDOM_ROTATION,RANDOM_ROTATION)
+        self.rotation%=360
+        for boid in neighbors:
+            if self.position.distance_to(boid.position) < RANGE:
+                self.rotation+=lerp(-MAX_ROTATION_PER_FRAME,MAX_ROTATION_PER_FRAME,-(self.rotation-self.velocity.angle_to(boid.position)))
+                self.rotation%=360
+        
+
+
+        self.rotation+=random.uniform(-RANDOM_ROTATION,RANDOM_ROTATION)
+        self.velocity = self.velocity.rotate(self.rotation-self.velocity.angle_to(Vector2(0,1)))
+        self.velocity = self.velocity.normalize()*self.state.value
+        
         
         
 
