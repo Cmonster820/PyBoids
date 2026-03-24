@@ -38,20 +38,35 @@ class Boid(pygame.sprite.Sprite):
                 self.neighbors.append(boid)
         if len(self.neighbors)>0:
             self.state = BoidState.NORMAL
+            average_neighbor_position = sum([boid.position for boid in self.neighbors])/len(self.neighbors)
+            average_neighbor_rotation = self.velocity.angle_to(average_neighbor_position)
+            self.rotation+=lerp(-MAX_ROTATION_PER_FRAME,MAX_ROTATION_PER_FRAME,average_neighbor_rotation-self.rotation)
+            self.rotation+=random.uniform(-RANDOM_ROTATION,RANDOM_ROTATION)
         else:
             self.state = BoidState.SEARCHING
-        average_neighbor_position = sum(neighbors.position)/len(neighbors)
-        average_neighbor_rotation = self.velocity.angle_to(average_neighbor_position)
-        self.rotation+=lerp(-MAX_ROTATION_PER_FRAME,MAX_ROTATION_PER_FRAME,average_neighbor_rotation-self.rotation)
-        self.rotation+=random.uniform(-RANDOM_ROTATION,RANDOM_ROTATION)
-        for boid in neighbors:
+        
+        for boid in self.neighbors:
             if self.position.distance_to(boid.position) < RANGE:
                 self.rotation+=lerp(-MAX_ROTATION_PER_FRAME,MAX_ROTATION_PER_FRAME,-(self.rotation-self.velocity.angle_to(boid.position)))
-        
+        if self.position.x<SIDE_THRESHOLD or SCREEN_WIDTH-self.position.x<SIDE_THRESHOLD:
+            self.rotation+=lerp(-3*MAX_ROTATION_PER_FRAME,3*MAX_ROTATION_PER_FRAME, self.velocity.angle_to(pygame.Vector2(-self.velocity.x,self.velocity.y)))
+        if self.position.y<SIDE_THRESHOLD or SCREEN_HEIGHT-self.position.y<SIDE_THRESHOLD:
+            self.rotation+=lerp(-3*MAX_ROTATION_PER_FRAME,3*MAX_ROTATION_PER_FRAME, self.velocity.angle_to(pygame.Vector2(self.velocity.x,-self.velocity.y)))
         self.rotation+=random.uniform(-RANDOM_ROTATION,RANDOM_ROTATION)
         self.rotation%=360
-        self.velocity = self.velocity.rotate(self.rotation-self.velocity.angle_to(Vector2(0,1)))
+        self.velocity = self.velocity.rotate(self.rotation-self.velocity.angle_to(pygame.Vector2(0,1)))
         self.velocity = self.velocity.normalize()*self.state.value
+
+    def triangle(self):
+        forward = pygame.Vector2(0, 1).rotate(self.rotation)
+        right = pygame.Vector2(0, 1).rotate(self.rotation + 90) * 5
+        a = self.position + forward * 5
+        b = self.position - forward * 5 - right
+        c = self.position - forward * 5 + right
+        return [a, b, c]
+
+    def draw(self,screen):
+        pygame.draw.polygon(screen, "white", self.triangle(), LINE_WIDTH)
         
         
         

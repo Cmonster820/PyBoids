@@ -7,3 +7,4 @@ def lerp(min_val,max_val,value):
         return max_val
     return min_val+(value-0)*((max_val-min_val)/(1-0))
 
+

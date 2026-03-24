@@ -18,11 +18,15 @@ def main():
     screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
     clock = pygame.time.Clock()
     dt = 0
+    for i in range(10):
+        Boid()
     while 1: #game loop
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
-        
+        for thing in updatable:
+            thing.update(boids)
+            thing.position+=thing.velocity*dt
         screen.fill("black")
         for thing in drawable:
             thing.draw(screen)
