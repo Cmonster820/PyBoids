@@ -36,7 +36,7 @@ class Boid(pygame.sprite.Sprite):
                 min_dist = dist
             if dist<NEIGHBOR_RANGE:
                 self.neighbors.append(boid)
-        if closest_boid:
+        if len(self.neighbors)>0:
             self.state = BoidState.NORMAL
         if not closest_boid:
             self.state = BoidState.SEARCHING
@@ -47,11 +47,12 @@ class Boid(pygame.sprite.Sprite):
         for boid in neighbors:
             if self.position.distance_to(boid.position) < RANGE:
                 self.rotation+=lerp(-MAX_ROTATION_PER_FRAME,MAX_ROTATION_PER_FRAME,-(self.rotation-self.velocity.angle_to(boid.position)))
-
+        
         self.rotation+=random.uniform(-RANDOM_ROTATION,RANDOM_ROTATION)
         self.rotation%=360
         self.velocity = self.velocity.rotate(self.rotation-self.velocity.angle_to(Vector2(0,1)))
         self.velocity = self.velocity.normalize()*self.state.value
+        self.position
         
         
         
