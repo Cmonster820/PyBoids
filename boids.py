@@ -52,7 +52,6 @@ class Boid(pygame.sprite.Sprite):
         self.rotation%=360
         self.velocity = self.velocity.rotate(self.rotation-self.velocity.angle_to(Vector2(0,1)))
         self.velocity = self.velocity.normalize()*self.state.value
-        self.position
         
         
         
