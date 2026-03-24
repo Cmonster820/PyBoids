@@ -38,7 +38,7 @@ class Boid(pygame.sprite.Sprite):
                 self.neighbors.append(boid)
         if len(self.neighbors)>0:
             self.state = BoidState.NORMAL
-        if not closest_boid:
+        else:
             self.state = BoidState.SEARCHING
         average_neighbor_position = sum(neighbors.position)/len(neighbors)
         average_neighbor_rotation = self.velocity.angle_to(average_neighbor_position)
